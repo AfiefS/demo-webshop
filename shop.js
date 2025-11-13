@@ -37,11 +37,23 @@ function renderBasket() {
     if (cartButtonsRow) cartButtonsRow.style.display = "none";
     return;
   }
+  // Count occurrences of each product and preserve order of first appearance
+  const productCounts = {};
+  const productOrder = [];
   basket.forEach((product) => {
+    if (!productCounts[product]) {
+      productCounts[product] = 0;
+      productOrder.push(product);
+    }
+    productCounts[product] += 1;
+  });
+  // Render each unique product with its quantity in order of first appearance
+  productOrder.forEach((product) => {
     const item = PRODUCTS[product];
     if (item) {
+      const quantity = productCounts[product];
       const li = document.createElement("li");
-      li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${item.name}</span>`;
+      li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${quantity}x ${item.name}</span>`;
       basketList.appendChild(li);
     }
   });
