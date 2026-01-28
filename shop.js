@@ -2,7 +2,10 @@ const PRODUCTS = {
   apple: { name: "Apple", emoji: "🍏" },
   banana: { name: "Banana", emoji: "🍌" },
   lemon: { name: "Lemon", emoji: "🍋" },
+  skewers: { name: "Wooden Skewers (5-pack)", emoji: "🥢", isFreeItem: true },
 };
+
+const FRUITS_PER_SKEWER_PACK = 3;
 
 function getBasket() {
   try {
@@ -16,10 +19,34 @@ function getBasket() {
   }
 }
 
+function getFruitCount(basket) {
+  return basket.filter((item) => item !== "skewers").length;
+}
+
+function getRequiredSkewerPacks(fruitCount) {
+  return Math.floor(fruitCount / FRUITS_PER_SKEWER_PACK);
+}
+
+function updateSkewersInBasket() {
+  const basket = getBasket();
+  const fruitCount = getFruitCount(basket);
+  const requiredSkewers = getRequiredSkewerPacks(fruitCount);
+  const currentSkewers = basket.filter((item) => item === "skewers").length;
+
+  if (requiredSkewers === currentSkewers) return;
+
+  const basketWithoutSkewers = basket.filter((item) => item !== "skewers");
+  const newSkewers = Array(requiredSkewers).fill("skewers");
+  const newBasket = [...basketWithoutSkewers, ...newSkewers];
+
+  localStorage.setItem("basket", JSON.stringify(newBasket));
+}
+
 function addToBasket(product) {
   const basket = getBasket();
   basket.push(product);
   localStorage.setItem("basket", JSON.stringify(basket));
+  updateSkewersInBasket();
 }
 
 function clearBasket() {
@@ -41,23 +68,32 @@ function renderBasket() {
     const item = PRODUCTS[product];
     if (item) {
       const li = document.createElement("li");
-      li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${item.name}</span>`;
+      const freeLabel = item.isFreeItem ? " <span class='free-label'>FREE</span>" : "";
+      li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${item.name}${freeLabel}</span>`;
       basketList.appendChild(li);
     }
   });
   if (cartButtonsRow) cartButtonsRow.style.display = "flex";
 }
 
+function getOrCreateIndicator() {
+  const existingIndicator = document.querySelector(".basket-indicator");
+  if (existingIndicator) return existingIndicator;
+
+  const basketLink = document.querySelector(".basket-link");
+  if (!basketLink) return null;
+
+  const indicator = document.createElement("span");
+  indicator.className = "basket-indicator";
+  basketLink.appendChild(indicator);
+  return indicator;
+}
+
 function renderBasketIndicator() {
   const basket = getBasket();
-  let indicator = document.querySelector(".basket-indicator");
-  if (!indicator) {
-    const basketLink = document.querySelector(".basket-link");
-    if (!basketLink) return;
-    indicator = document.createElement("span");
-    indicator.className = "basket-indicator";
-    basketLink.appendChild(indicator);
-  }
+  const indicator = getOrCreateIndicator();
+  if (!indicator) return;
+
   if (basket.length > 0) {
     indicator.textContent = basket.length;
     indicator.style.display = "flex";
