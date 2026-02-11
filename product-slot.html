@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slot Machine - Fruit Shop</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header role="banner">
+      <div class="header-center">
+        <a href="index.html" class="logo" aria-label="Go to homepage">
+          <img
+            src="img/fruit-shop-logo.png"
+            class="logo-img"
+            alt="Fruit Shop Logo"
+          />
+          <span class="products-text"> View Products </span>
+        </a>
+        <nav role="navigation" aria-label="Main navigation">
+          <a
+            href="basket.html"
+            class="basket-link"
+            aria-label="View shopping basket"
+          >
+            <img
+              src="img/basket-icon.png"
+              class="basket-img"
+              alt="Shopping basket icon"
+            />
+            <span class="basket-text">View shopping basket</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+    <main id="main-content" role="main">
+      <div class="content-box">
+        <div id="slotDisplay" class="emoji-display" role="img" aria-label="Slot display">🎰</div>
+        <h1>Slot Machine</h1>
+        <div class="product-desc" aria-label="Product description">
+          Spin the slot to get a random fruit added to your basket.
+        </div>
+        <div id="spinResult" class="slot-result" aria-live="polite"></div>
+        <div class="button-container">
+          <button id="spinAdd" class="cart-action-btn" aria-label="Spin and add random fruit to basket">Add to Basket</button>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <a
+        href="https://www.linkedin.com/in/timlolkema/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        By Tim Lolkema
+      </a>
+    </footer>
+    <script src="shop.js"></script>
+    <script>
+      // Slot machine: uses available fruits from PRODUCTS
+      (function () {
+        const btn = document.getElementById('spinAdd');
+        const display = document.getElementById('slotDisplay');
+        const result = document.getElementById('spinResult');
+        if (!btn || !display) return;
+
+        function getFruitKeys() {
+          try {
+            return Object.keys(PRODUCTS).filter(k => PRODUCTS[k] && typeof PRODUCTS[k].emoji === 'string');
+          } catch (e) {
+            return ['apple','banana','lemon'];
+          }
+        }
+
+        btn.addEventListener('click', function () {
+          const fruits = getFruitKeys();
+          if (fruits.length === 0) return;
+          btn.disabled = true;
+          result.textContent = '';
+
+          const cycles = 20;
+          const interval = 80;
+
+          for (let i = 0; i < cycles; i++) {
+            setTimeout(() => {
+              const idx = i % fruits.length;
+              display.textContent = PRODUCTS[fruits[idx]].emoji;
+            }, i * interval);
+          }
+
+          // Final pick after cycle
+          setTimeout(() => {
+            const pick = fruits[Math.floor(Math.random() * fruits.length)];
+            const picked = PRODUCTS[pick];
+            display.textContent = picked.emoji;
+            result.textContent = `You got: ${picked.name}`;
+            addToBasket(pick);
+            btn.disabled = false;
+          }, cycles * interval + 50);
+        });
+      })();
+    </script>
+  </body>
+</html>
