@@ -58,3 +58,5 @@ demo-webshop/
 ---
 
 _This demo webshop is part of the AI agent workshop series. Check out the workshop repositories for hands-on learning with AI agents and automation tools._
+
+Testing tekst voor extended opdracht
