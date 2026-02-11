@@ -2,6 +2,7 @@ const PRODUCTS = {
   apple: { name: "Apple", emoji: "🍏" },
   banana: { name: "Banana", emoji: "🍌" },
   lemon: { name: "Lemon", emoji: "🍋" },
+  orange: { name: "Orange", emoji: "🍊" },
 };
 
 function getBasket() {
@@ -37,6 +38,7 @@ function renderBasket() {
     if (cartButtonsRow) cartButtonsRow.style.display = "none";
     return;
   }
+  // Render purchased items
   basket.forEach((product) => {
     const item = PRODUCTS[product];
     if (item) {
@@ -45,6 +47,19 @@ function renderBasket() {
       basketList.appendChild(li);
     }
   });
+
+  // Compute freebies: 1 free orange for every 4 apples
+  const appleCount = basket.filter((p) => p === "apple").length;
+  const freeOranges = Math.floor(appleCount / 4);
+  for (let i = 0; i < freeOranges; i++) {
+    const orange = PRODUCTS["orange"];
+    if (orange) {
+      const li = document.createElement("li");
+      li.innerHTML = `<span class='basket-emoji'>${orange.emoji}</span> <span>${orange.name} <strong>(free)</strong></span>`;
+      li.classList.add("freebie");
+      basketList.appendChild(li);
+    }
+  }
   if (cartButtonsRow) cartButtonsRow.style.display = "flex";
 }
 
@@ -58,8 +73,12 @@ function renderBasketIndicator() {
     indicator.className = "basket-indicator";
     basketLink.appendChild(indicator);
   }
-  if (basket.length > 0) {
-    indicator.textContent = basket.length;
+  // Include freebies in the indicator count
+  const appleCount = basket.filter((p) => p === "apple").length;
+  const freeOranges = Math.floor(appleCount / 4);
+  const totalCount = basket.length + freeOranges;
+  if (totalCount > 0) {
+    indicator.textContent = totalCount;
     indicator.style.display = "flex";
   } else {
     indicator.style.display = "none";
@@ -69,18 +88,24 @@ function renderBasketIndicator() {
 // Call this on page load and after basket changes
 if (document.readyState !== "loading") {
   renderBasketIndicator();
+  renderBasket();
 } else {
-  document.addEventListener("DOMContentLoaded", renderBasketIndicator);
+  document.addEventListener("DOMContentLoaded", function () {
+    renderBasketIndicator();
+    renderBasket();
+  });
 }
 
 // Patch basket functions to update indicator
 const origAddToBasket = window.addToBasket;
 window.addToBasket = function (product) {
   origAddToBasket(product);
+  renderBasket();
   renderBasketIndicator();
 };
 const origClearBasket = window.clearBasket;
 window.clearBasket = function () {
   origClearBasket();
+  renderBasket();
   renderBasketIndicator();
 };
