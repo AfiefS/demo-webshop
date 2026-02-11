@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slot Machine - Fruit Shop</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .slot-center { text-align: center; }
+      .slot-display { font-size: 6rem; margin: 1rem 0; }
+      .result-text { margin: 0.5rem 0; }
+    </style>
+  </head>
+  <body>
+    <header role="banner">
+      <div class="header-center">
+        <a href="index.html" class="logo" aria-label="Go to homepage">
+          <img
+            src="img/fruit-shop-logo.png"
+            class="logo-img"
+            alt="Fruit Shop Logo"
+          />
+          <span class="products-text"> View Products </span>
+        </a>
+        <nav role="navigation" aria-label="Main navigation">
+          <a
+            href="basket.html"
+            class="basket-link"
+            aria-label="View shopping basket"
+          >
+            <img
+              src="img/basket-icon.png"
+              class="basket-img"
+              alt="Shopping basket icon"
+            />
+            <span class="basket-text">View shopping basket</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+    <main id="main-content" role="main">
+      <div class="content-box slot-center">
+        <div class="emoji-display slot-display" id="slotDisplay" role="img" aria-label="Slot display">🎰</div>
+        <h1>Slot Machine</h1>
+        <div class="product-desc" aria-label="Slot description">
+          Spin the slot machine to get a random fruit added to your basket!
+        </div>
+        <div class="button-container">
+          <button
+            id="addToBasket"
+            class="cart-action-btn"
+            aria-label="Spin slot machine and add random fruit to basket"
+          >
+            Add to Basket
+          </button>
+        </div>
+        <p class="result-text" id="result"></p>
+      </div>
+    </main>
+    <footer>
+      <a
+        href="https://www.linkedin.com/in/timlolkema/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        By Tim Lolkema
+      </a>
+    </footer>
+    <script src="shop.js"></script>
+    <script>
+      document.getElementById("addToBasket").onclick = function () {
+        const fruits = ["apple", "banana", "lemon"];
+        const emojis = { apple: "🍏", banana: "🍌", lemon: "🍋" };
+        const display = document.getElementById("slotDisplay");
+        const result = document.getElementById("result");
+        const btn = document.getElementById("addToBasket");
+        btn.disabled = true;
+        result.textContent = "Spinning...";
+        let i = 0;
+        const spinInterval = setInterval(() => {
+          const f = fruits[i % fruits.length];
+          display.textContent = emojis[f];
+          i++;
+        }, 100);
+        const duration = 1500;
+        setTimeout(() => {
+          clearInterval(spinInterval);
+          const pick = fruits[Math.floor(Math.random() * fruits.length)];
+          display.textContent = emojis[pick];
+          result.textContent = `You got ${PRODUCTS[pick].name}! Added to basket.`;
+          addToBasket(pick);
+          btn.disabled = false;
+        }, duration);
+      };
+    </script>
+  </body>
+</html>
